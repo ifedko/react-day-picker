@@ -13,6 +13,7 @@ import CustomElements from './examples/CustomElements';
 import FixedWeeks from './examples/FixedWeeks';
 import InputField from './examples/InputField';
 import InputFieldOverlay from './examples/InputFieldOverlay';
+import InputFieldOverlayAdvanced from './examples/InputFieldOverlayAdvanced';
 import Localized from './examples/Localized';
 import LocalizedCustom from './examples/LocalizedCustom';
 import Modifiers from './examples/Modifiers';
@@ -116,6 +117,11 @@ const EXAMPLES = {
     title: 'Input Field with Overlay',
     description: 'A more complex example showing the day picker on input\'s focus and hiding it on input\'s blur.',
     Component: InputFieldOverlay,
+  },
+  overlayAdvanced: {
+    title: 'Input Field with Overlay and Disabled days',
+    description: 'A more complex example showing the day picker on input\'s focus and hiding it on input\'s blur with disabled days.',
+    Component: InputFieldOverlayAdvanced,
   },
   year: {
     title: 'Year Calendar',
