@@ -162,7 +162,7 @@ export default class InputFieldOverlayAdvanced extends Component {
             <div style={ overlayStyle }>
               <DayPicker
                 ref={ el => { this.daypicker = el; } }
-                initialMonth={(this.state.selectedDay || new Date())}
+                initialMonth={this.state.selectedDay}
                 onDayClick={ this.handleDayClick }
                 selectedDays={ day => DateUtils.isSameDay(this.state.selectedDay, day) }
                 disabledDays={this.isDisabledDay}
