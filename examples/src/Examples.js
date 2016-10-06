@@ -120,7 +120,7 @@ const EXAMPLES = {
   },
   overlayAdvanced: {
     title: 'Input Field with Overlay and Disabled days',
-    description: 'A more complex example showing the day picker on input\'s focus and hiding it on input\'s blur with disabled days.',
+    description: 'A more complex example showing the day picker on input\'s focus and hiding it on input\'s blur. Special method fetches disabled dates.',
     Component: InputFieldOverlayAdvanced,
   },
   year: {

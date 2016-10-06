@@ -10,29 +10,51 @@ const overlayStyle = {
   boxShadow: '0 2px 5px rgba(0, 0, 0, .15)',
 };
 
+let datesContainer = {};
+
 const fetchDisabledDates = (monthDate) => {
-  const randomDate = (startDate, endDate) => {
-    return new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+  const
+      year = monthDate.getFullYear(),
+      month = monthDate.getMonth(),
+      countDates = 5;
+
+  const addDatesToDatesContainer = (datesContainer, year, month, dates) => {
+    if (datesContainer[year] === undefined) {
+      datesContainer[year] = {};
+    }
+    if (datesContainer[year][month] === undefined) {
+      datesContainer[year][month] = [];
+    }
+    datesContainer[year][month] = dates;
   };
 
   const randomDates = (year, month, countDates = 1) => {
     const
         firstDate = new Date(year, month, 1),
-        lastDate = new Date(year, month + 1, 0);
+        lastDate = new Date(year, month + 1, 0),
+        randomDate = (startDate, endDate) => {
+          return new Date(
+              startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime())
+          );
+        };
 
     let randomDates = [];
     for (let i = 0; i < countDates; i++) {
-      randomDates.push(randomDate(firstDate, lastDate));
+      randomDates.push((randomDate(firstDate, lastDate)));
     }
 
     return randomDates;
   };
 
-  const
-      year = monthDate.getFullYear(),
-      month = monthDate.getMonth(),
-      countDates = 5;
-  return randomDates(year, month, countDates);
+  let dates = [];
+  if (!datesContainer[year] || !datesContainer[year][month] || datesContainer[year][month].length === 0) {
+    dates = randomDates(year, month, countDates);
+    addDatesToDatesContainer(datesContainer, year, month, dates);
+  } else {
+    dates = datesContainer[year][month];
+  }
+
+  return dates;
 };
 
 export default class InputFieldOverlayAdvanced extends Component {
@@ -80,9 +102,14 @@ export default class InputFieldOverlayAdvanced extends Component {
   }
 
   handleInputFocus() {
-    this.setState({
-      showOverlay: true,
-    });
+    // if calendar is shown, we need to prevent repeatly dates fetching and update state (when handleInputBlur)
+    if (this.state.showOverlay === false) {
+      const currentDay = (this.state.selectedDay || moment().toDate());
+      this.fetchDisabledDays(currentDay);
+      this.setState({
+        showOverlay: true,
+      });
+    }
   }
 
   handleInputBlur() {
@@ -127,21 +154,15 @@ export default class InputFieldOverlayAdvanced extends Component {
   }
 
   isDisabledDay (day) {
-    const disabledDays = (this.state.disabledDays || []);
-    return disabledDays.find((disabledDay) => {
-          const date = DateUtils.clone(day);
-          const disabledDate = DateUtils.clone(disabledDay);
-
-          date.setHours(0, 0, 0, 0);
-          disabledDate.setHours(0, 0, 0, 0);
-          return (date.getTime() === disabledDate.getTime());
-        }) !== undefined;
+    return (this.state.disabledDays || []).find((disabledDay) => {
+      return (DateUtils.isSameDay(disabledDay, day));
+    }) !== undefined;
   }
 
   fetchDisabledDays (day) {
-    const monthDisabledDays = fetchDisabledDates(day);
+    const disabledDays = fetchDisabledDates(day);
     this.setState({
-      disabledDays: monthDisabledDays
+      disabledDays: disabledDays
     });
   }
 
@@ -162,7 +183,7 @@ export default class InputFieldOverlayAdvanced extends Component {
             <div style={ overlayStyle }>
               <DayPicker
                 ref={ el => { this.daypicker = el; } }
-                initialMonth={(this.state.selectedDay || new Date())}
+                initialMonth={ this.state.selectedDay || undefined }
                 onDayClick={ this.handleDayClick }
                 selectedDays={ day => DateUtils.isSameDay(this.state.selectedDay, day) }
                 disabledDays={this.isDisabledDay}
